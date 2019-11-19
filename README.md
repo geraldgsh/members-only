@@ -294,3 +294,245 @@ Rails.application.routes.draw do
   match '/signout', to: 'sessions#destroy',     via: 'delete'
 end
 ```
+
+### Authentication and Posts
+
+1 .Create a Post model and a Posts controller and a corresponding resource in your Routes file which allows the [:new, :create, :index] methods.
+```sh
+$rails generate model Post title:string body:text
+      invoke  active_record
+      create    db/migrate/20191119210824_create_posts.rb
+      create    app/models/post.rb
+      invoke    test_unit
+      create      test/models/post_test.rb
+      create      test/fixtures/posts.yml
+
+$rails generate controller posts
+
+      create  app/controllers/posts_controller.rb
+      invoke  erb
+      create    app/views/posts
+      invoke  test_unit
+      create    test/controllers/posts_controller_test.rb
+      invoke  helper
+      create    app/helpers/posts_helper.rb
+      invoke    test_unit
+      invoke  assets
+      invoke    scss
+      create      app/assets/stylesheets/posts.scss
+
+# ../config/routes.rb
+
+Rails.application.routes.draw do
+.
+.
+  resources :Posts, only:  [:new, :create, :index]
+  root 'posts#index'
+.
+.
+.
+
+$ rails db:migrate
+/home/ggoh/.rbenv/versions/2.6.5/lib/ruby/gems/2.6.0/gems/railties-6.0.1/lib/rails/app_loader.rb:53: warning: Insecure world writable dir /mnt/c in PATH, mode 040777
+== 20191119200826 AddRememberTokenToUsers: migrating ==========================
+-- add_column(:users, :remember_token, :string)
+   -> 0.0244s
+-- add_index(:users, :remember_token)
+   -> 0.0061s
+== 20191119200826 AddRememberTokenToUsers: migrated (0.0369s) =================
+
+== 20191119210824 CreatePosts: migrating ======================================
+-- create_table(:posts)
+   -> 0.0031s
+== 20191119210824 CreatePosts: migrated (0.0080s) =============================
+
+../app/models/post.rb 
+
+
+class Post < ActiveRecord::Base
+  belongs_to :user
+
+  validates :title,  presence: true
+  validates :body, presence: true
+end
+
+```
+
+2. Atop your Posts Controller, use a #before_action to restrict access to the #new and #create methods to only users who are signed in. Create the necessary helper methods in your ApplicationController.
+```sh
+class Post < ApplicationRecord
+  before_action :signed_in_user, only: [:new, :create]
+
+  # before filter/action
+   def signed_in_user
+    unless signed_in?
+      redirect_to signin_url
+    end
+  end
+end
+```
+
+3. For your Posts Controller, prepare your #new action.
+```sh
+
+# ../app/controller/posts_controller.rb
+
+class PostsController < ApplicationController
+  def new
+    @Post = Post.new
+  end
+end
+
+```
+
+4. Write a very simple form in the app/views/posts/new.html.erb view which will create a new Post.
+```sh
+
+# ../app/views/posts/new.html.erb
+
+<h1>New Post</h1>
+
+<%= form_for @post do |f| %>
+
+<p>
+  <%= f.label :title %> <br/>
+  <%= f.text_field :title %>
+</p>
+<p>
+  <%= f.label :body %><br />
+  <%= f.text_area :body %>
+</p>
+
+<p>
+  <%= f.submit %>
+</p>
+
+<% end %>
+
+```
+
+5. Make your corresponding #create action build a post where the foreign key for the author (e.g. user_id) is automatically populated based on whichever user is signed in. Redirect to the Index view if successful.
+```sh
+$ rails generate migration AddForeignKeyToPost user:references
+
+      invoke  active_record
+      create    db/migrate/20191119213057_add_foreign_key_to_post.rb
+
+$ rails db:migrate
+
+== 20191119213057 AddForeignKeyToPost: migrating ==============================
+-- add_reference(:posts, :user, {:foreign_key=>true})
+   -> 0.0204s
+== 20191119213057 AddForeignKeyToPost: migrated (0.0215s) =====================
+
+# ../app/models/post.rb
+
+class Post < ApplicationRecord
+  belongs_to :user
+
+
+# ../app/models/user.rb
+class User < ApplicationRecord
+  has_many :posts
+
+# ../app/controller/post_controller.rb
+
+class PostsController < ApplicationController
+  before_action :signed_in_user, only: [:new, :create]
+.
+.
+  def create
+    @post = Post.new(post_params)
+    @post.user_id = current_user.id
+    @post.save
+    redirect_to root_path
+  end
+
+  private
+
+    def post_params
+      params.require(:post).permit(:title, :body)  
+    end
+    
+end
+
+# ../app/controller/sessions_controller.rb
+
+class SessionsController < ApplicationController
+.
+.
+.
+  def create
+    redirect_to root_path
+.
+.
+. 
+```
+
+6. Fill out the #index action of the PostsController and create the corresponding view. The view should show a list of every post.
+```sh
+# ../app/controller/post_controller.rb
+
+class PostsController < ApplicationController
+.
+.
+.
+  def index
+    @Post = Post.all
+  end
+.
+.
+.
+
+# ../app/views/posts/index.html.erb
+
+<div class="float-right">
+  <% if signed_in? %>
+  <%= link_to "(#{current_user.name}) Sign out", signout_path, method: "delete" %>
+  <% else %>
+    <%= link_to 'Sign in', signin_path %>
+  <% end %>
+</div>
+
+<h1>Members Only Posts</h1>
+
+<% @posts.each do |post| %>
+  <% if signed_in? %>
+    <p class="float-right">
+      Posted by:
+      <%= post.user.name %>
+    </p>
+  <% end %>
+  <h4 class="float-left"><%=post.title %></h4>  
+  <p class="clear"><%= post.body %></p>
+<% end %>
+
+<% if signed_in? %>
+  <%= link_to "Create a Post", new_post_path %>
+<% end %>
+
+```
+
+7. Now add logic in your Index view to display the author’s name, but only if a user is signed in.
+```sh
+# ../app/controller/post_controller.rb
+
+class PostsController < ApplicationController
+.
+.
+.
+  private
+    def signed_in_user
+      unless signed_in?
+        redirect_to signin_url
+      end
+    end
+.
+.
+.
+
+```
+
+8. Sign in and create a few secret posts.
+
+9. Test it out – sign out and go to the index page. You should see a list of the posts but no author names. Sign in and the author names should appear. Your secrets are safe!
