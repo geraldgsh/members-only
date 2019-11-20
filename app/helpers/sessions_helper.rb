@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SessionsHelper
   def sign_in(user)
     remember_token = User.new_remember_token
@@ -18,7 +20,7 @@ module SessionsHelper
   def signed_in?
     !current_user.nil?
   end
-  
+
   def sign_out
     current_user.update_attribute(:remember_token,
                                   User.digest(User.new_remember_token))

@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class PostsController < ApplicationController
-  before_action :signed_in_user, only: [:new, :create]
+  before_action :signed_in_user, only: %i[new create]
 
   def new
     @post = Post.new
@@ -18,15 +20,12 @@ class PostsController < ApplicationController
 
   private
 
-    def post_params
-      params.require(:post).permit(:title, :body)  
-    end
+  def post_params
+    params.require(:post).permit(:title, :body)
+  end
 
-    # before filter/action
-    def signed_in_user
-      unless signed_in?
-        redirect_to sigin_url
-      end
-    end
-  
+  # before filter/action
+  def signed_in_user
+    redirect_to sigin_url unless signed_in?
+  end
 end
