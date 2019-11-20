@@ -536,3 +536,16 @@ class PostsController < ApplicationController
 8. Sign in and create a few secret posts.
 
 9. Test it out – sign out and go to the index page. You should see a list of the posts but no author names. Sign in and the author names should appear. Your secrets are safe!
+
+### Extra stuff 
+
+1. Added flash message feature for valid and invalid login
+```sh
+# ./app/views/layout/application.html.erb
+<div>
+  <% flash.each do |message_type, message| %>
+    <%= content_tag(:div, message, class: "alert alert-#{message_type}") %>
+  <% end %>
+  <%= yield %>
+</div>
+```
