@@ -13,3 +13,14 @@
  *= require_tree .
  *= require_self
  */
+
+@import "bulma";
+
+.hero.is-success {
+    background-color: #dfcdc3;
+    color: #fff;
+}
+
+.background {
+    background-color: #dfcdc3;
+}

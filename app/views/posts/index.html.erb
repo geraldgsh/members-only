@@ -1,24 +1,54 @@
+
+
+<div class="container">
 <div class="float-right">
   <% if signed_in? %>
-  <%= link_to "(#{current_user.name}) Sign out", signout_path, method: "delete" %>
+  <%= link_to "(#{current_user.name}) Sign out", signout_path, method: "delete"%>
   <% else %>
-    <%= link_to 'Sign in', signin_path %>
+    <%= link_to 'Sign in', signin_path, { :class=>"button is-link is-light" } %>
   <% end %>
 </div>
 
-<h1>Members Only Posts</h1>
+<div class="columns">
+  <div class="column"></div>
+  <div class="column"><h3 class="title is-3">Members Only Posts</h3></div>
+  <div class="column"></div>
+  
+</div>
+
 
 <% @posts.each do |post| %>
-  <% if signed_in? %>
-    <p class="float-right">
-      Posted by:
-      <%= post.user.name %>
-    </p>
-  <% end %>
-  <h4 class="float-left"><%=post.title %></h4>  
-  <p class="clear"><%= post.body %></p>
-<% end %>
+<div class="box">
+  <article class="media">
+    <div class="media-left">
+      <figure class="image is-64x64">
+        <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
+      </figure>
+    </div>
+    <div class="media-content">
+      <div class="content">
+      <% if signed_in? %>
+        <h4><%=post.title %></h4><br>
+        <p>
+          <strong>Posted by: <%= post.user.name %></strong> 
+          <br>
+          <%= post.body %>
+        </p>
 
-<% if signed_in? %>
-  <%= link_to "Create a Post", new_post_path %>
+        <% else %>
+        <h4><%=post.title %></h4><br>
+        <p>
+          <%= post.body %>
+        </p>
+
+        <% end %> 
+      </div>
+      
+    </div>
+  </article>
+</div>
 <% end %>
+<% if signed_in? %>
+  <%= link_to "Create a Post", new_post_path,  { :class=>"button is-link is-light" } %>
+<% end %>
+</div>

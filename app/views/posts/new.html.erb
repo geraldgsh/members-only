@@ -1,18 +1,34 @@
-<h1>New Post</h1>
+<section class="hero is-success is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <div class="column is-4 is-offset-4">
+                    <h3 class="title has-text-black">Posts</h3>
+                    <hr class="login-hr">
+                    <p class="subtitle has-text-black">New Posts</p>
+                    <div class="box">
+                         <%= form_for @post do |f| %>
+                            <div class="field">
+                                <div class="control">
+                                  <%= f.text_field :title, class: 'input is-large', placeholder: 'Title' %>
+                                </div>
+                            </div>
+                            <div class="field">
+                              <label class="label">Message</label>
+                              <div class="control">
+      
+                                <%= f.text_area :body, class: 'textarea', placeholder: 'Your text' %>
+                              </div>
+                            </div>
 
-<%= form_for @post do |f| %>
-
-<p>
-  <%= f.label :title %> <br/>
-  <%= f.text_field :title %>
-</p>
-<p>
-  <%= f.label :body %><br />
-  <%= f.text_area :body %>
-</p>
-
-<p>
-  <%= f.submit %>
-</p>
-
-<% end %>
+                    
+                            <div class="field">
+                               
+                            </div>
+      
+                            <%= f.submit "New Post", class: "button is-block is-info is-large is-fullwidth" %>
+                        <% end %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
