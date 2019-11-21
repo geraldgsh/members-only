@@ -2,7 +2,7 @@
 
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  #include SessionsHelper
+  # include SessionsHelper
 
   def sign_in(user)
     remember_token = User.new_remember_token
@@ -11,9 +11,7 @@ class ApplicationController < ActionController::Base
     self.current_user = user
   end
 
-  def current_user=(user)
-    @current_user = user
-  end
+  attr_writer :current_user
 
   def current_user
     remember_token = User.digest(cookies[:remember_token])
