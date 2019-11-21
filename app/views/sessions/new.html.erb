@@ -1,0 +1,34 @@
+<!-- <% provide(:title, "Log in") %> -->
+<section class="hero is-success is-fullheight">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <div class="column is-4 is-offset-4">
+        <h3 class="title has-text-black">Login</h3>
+        <hr class="login-hr">
+        <p class="subtitle has-text-black">Please login to proceed.</p>
+        <div class="box">
+          <figure class="avatar">
+            <%= image_tag "images.png" %>
+          </figure>
+          <%= form_for(:session, url: signin_path) do |f| %>
+          <div class="field">
+              <div class="control">
+                   <%= f.email_field :email, class: 'input is-large', placeholder: 'Your Email' %>
+              </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+                  <%= f.password_field :password, class: 'input is-large', placeholder: 'Your Password' %>
+            </div>
+          </div>
+          <%= f.submit "Log in", class: "button is-block is-info is-large is-fullwidth" %>
+          <% end %>
+        </div>
+        <p class="has-text-grey">
+          &nbsp;·&nbsp; <a href="/signup">Sign Up</a> &nbsp;·&nbsp;
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

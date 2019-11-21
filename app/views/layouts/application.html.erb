@@ -1,15 +1,36 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html class="background">
+  <head >
     <title>MembersOnly</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <%= yield %>
+    <div>
+      <% flash.each do |message_type, message| %>
+        <button class="delete"></button>  
+        <%= content_tag(:div, message, class: "notification is-#{message_type}") %>
+      <% end %>
+      <%= yield %>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+          $notification = $delete.parentNode;
+          $delete.addEventListener('click', () => {
+            $notification.parentNode.removeChild($notification);
+          });
+        });
+    });
+    </script> 
   </body>
 </html>
